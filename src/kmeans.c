@@ -1,6 +1,6 @@
 /*
     Alunos: Juliano Magalhães Jurity & João Victor de Lima
-    Matrícula: 20241045050456
+    Matrícula: 20241045050456 & 20241045050057
     Avaliação 04: Trabalho Final
     04.505.23 - 2024.2 - Prof Daniel Ferreira
     Compilador: gcc versão 13.2.0
