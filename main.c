@@ -4,32 +4,66 @@
 #include <math.h>
 #include "kmeans.h"
 
-
 int main(int argc, char *argv[]) {
     srand(time(NULL));
 
-    if (argc != 3) {
-        printf("Formato: \n\t %s <imagemEntrada.pgm> <imagemSaida.pgm>\n", argv[0]);
+    if (argc != 4) {
+        printf("Formato: \n\t %s <imagemEntrada.pgm> <imagemSaida.pgm> <o que deseja fazer: 1 calcular inercia, 2 clusterizaçao>\n", argv[0]);
         exit(1);
     }
 
     struct pgm img;
-    readPGMImage(&img, argv[1]); 
+    readPGMImage(&img, argv[1]);
 
-	int k = 4;
+    int op = atoi(argv[3]);
 
-    int *vetor = (int *)malloc(k * sizeof(int));
-    int *vetorContadores = (int *)calloc(k, sizeof(int));
-    int *vetorSomatorio = (int *)calloc(k, sizeof(int));
+    if(op == 1){
+        FILE *fp = fopen("inercia.txt", "w");
+    
+        if (fp == NULL) {
+        printf("Erro ao abrir o arquivo\n");
+            exit(1);
+        }
+        
+        printf("Vamos calcular de k = 1 ate k = 10\n");
+        
+        for (int k = 1; k <= 10; k++) {
+            printf("Executando K-Means para K = %d...\n", k);
+            readPGMImage(&img, argv[2]);
+            int *vetor = (int *)malloc(k * sizeof(int));
+            int *vetorContadores = (int *)calloc(k, sizeof(int));
+            int *vetorSomatorio = (int *)calloc(k, sizeof(int));
 
-	gerarCentroids(&img, vetor, k);
+            for (int i = 0; i < k; i++) {
+                int index = rand() % (img.r * img.c);
+                vetor[i] = img.pData[index];
+            }
 
+            clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
+            double inercia = calcularInercia(&img, vetor, k);
+                    
+            fprintf(fp, "%d %.2f\n", k, inercia);
+            printf("K=%d, Inércia=%.2f\n", k, inercia);
 
-	menu(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
+            free(vetor);
+            free(vetorContadores);
+            free(vetorSomatorio);
+        }
+        fclose(fp);
+    }
 
-    free(vetor);
-    free(vetorContadores);
-    free(vetorSomatorio);
+    else if(op == 2){
+        int k;
+        printf("Digite o numero de K: ");
+        scanf("%d", &k);
+        int *vetor = (int *)malloc(k * sizeof(int));
+        int *vetorContadores = (int *)calloc(k, sizeof(int));
+        int *vetorSomatorio = (int *)calloc(k, sizeof(int));
+
+        gerarCentroids(&img, vetor, k);
+
+        clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
+    }
 
     return 0;
 }
