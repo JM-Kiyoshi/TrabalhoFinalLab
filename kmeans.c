@@ -1,9 +1,17 @@
+/*
+    Alunos: Juliano Magalhães Jurity & João Victor de Lima
+    Matrícula: 20241045050456
+    Avaliação 04: Trabalho Final
+    04.505.23 - 2024.2 - Prof Daniel Ferreira
+    Compilador: gcc versão 13.2.0
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "kmeans.h"
 
 #define MAX_ITERACOES 50
-#define EPSILON 1
 
 
 void readPGMImage(struct pgm *pio, char *filename){
@@ -157,7 +165,7 @@ int gerarNovosClusters(struct pgm *pio, int *v, int k, int *vetorSoma, int *veto
 		if(vetorContador[i] != 0){
 			int novoCluster = vetorSoma[i] / vetorContador[i];
 			
-			if(abs(v[i] - novoCluster) > EPSILON){
+			if(abs(v[i] - novoCluster) > 1){
 				v[i] = novoCluster;
 				flag = 1;
 			}
@@ -170,13 +178,19 @@ int gerarNovosClusters(struct pgm *pio, int *v, int k, int *vetorSoma, int *veto
 	return flag;
 }
 
-void clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *vetorSoma, int *vetorContador){
+struct pgm clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *vetorSoma, int *vetorContador){
 	for (int i = 0; i < k; i++) {
 		v[i] = rand()%(pio->mv+1);
     }
 	int iteracoes = 0;
     int mudou;
-	unsigned char *novaImagem = (unsigned char*) malloc(pio->r * pio->c * sizeof(unsigned char));
+	struct pgm novaImagem;
+	novaImagem.r = pio->r;
+	novaImagem.c = pio->c;
+	novaImagem.mv = pio->mv;
+
+	novaImagem.pData = (unsigned char *) malloc(novaImagem.r * novaImagem.c * sizeof(unsigned char));
+	
 
     do {
         zeraVetorSomaEContador(k, vetorSoma, vetorContador);
@@ -185,7 +199,7 @@ void clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *vetorSom
             for (int j = 0; j < pio->c; j++) {
                 int index = i * pio->c + j;
                 int clusterIndex = retornaMenorDistancia(v, k, pio->pData[index], vetorSoma, vetorContador);
-                novaImagem[index] = v[clusterIndex];
+                novaImagem.pData[index] = v[clusterIndex];
             }
         }
 
@@ -197,10 +211,56 @@ void clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *vetorSom
 		}
     } while (mudou != 0);
 
-	for (int i = 0; i < pio->r * pio->c; i++)
-	{
-		pio->pData[i] = novaImagem[i];
+	return novaImagem;
+}
+
+
+
+int retornaQuantidadePixelIgual(struct pgm *img1, struct pgm *img2){
+	int contador = 0;
+	if((img1->r*img1->c) == (img2->r*img2->c)){
+		for (int i = 0; i < img1->r; i++)
+		{
+			for (int j = 0; j < img1->c; j++)
+			{
+				int index = i * img1->c + j;
+				if(img1->pData[index] == img2->pData[index]){
+					contador++;
+				}
+			}
+			
+		}
 	}
-	free(novaImagem);
-	writePGMImage(pio, filename);
+	else{
+		return 0;
+	}
+	
+	return contador;
+}
+
+int retornaTotalDePixel(struct pgm *img1, struct pgm *img2){
+	int contador1 = 0;
+	int contador2 = 0;
+	for (int i = 0; i < img1->r * img1->c; i++)
+	{
+		contador1++;
+	}
+
+	for (int i = 0; i < img2->r * img2->c; i++)
+	{
+		contador2++;
+	}
+	
+	return contador1+contador2;
+}
+
+double dice(struct pgm *img1, struct pgm *img2){
+	double resultado = 0;
+	int numPixelIgual = retornaQuantidadePixelIgual(img1, img2);
+	int numPixelTotal = retornaTotalDePixel(img1, img2);
+	printf("numero de pixel igual: %d\n", numPixelIgual);
+	printf("numero de pixel total: %d\n", numPixelTotal);
+	resultado = 2*((double)numPixelIgual)/numPixelTotal;
+
+	return resultado;
 }

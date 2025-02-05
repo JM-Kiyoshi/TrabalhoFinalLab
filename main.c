@@ -1,3 +1,13 @@
+/*
+    Alunos: Juliano Magalhães Jurity & João Victor de Lima
+    Matrícula: 20241045050456
+    Avaliação 04: Trabalho Final
+    04.505.23 - 2024.2 - Prof Daniel Ferreira
+    Compilador: gcc versão 13.2.0
+
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -8,12 +18,14 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
 
     if (argc != 4) {
-        printf("Formato: \n\t %s <imagemEntrada.pgm> <imagemSaida.pgm> <o que deseja fazer: 1 calcular inercia, 2 clusterizaçao>\n", argv[0]);
+        printf("Formato: \n\t %s <imagemEntrada.pgm> <imagemSaida.pgm> <o que deseja fazer: 1 - calcular inercia, 2 - clusterizaçao>\n", argv[0]);
         exit(1);
     }
 
     struct pgm img;
+    struct pgm teste;
     readPGMImage(&img, argv[1]);
+    readPGMImage(&teste, argv[1]);
 
     int op = atoi(argv[3]);
 
@@ -62,8 +74,16 @@ int main(int argc, char *argv[]) {
 
         gerarCentroids(&img, vetor, k);
 
-        clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
+        struct pgm resultado = clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
+        writePGMImage(&resultado, argv[2]);
+        double diceResultado = dice(&img, &resultado);
+        printf("dice: %.2f\n", diceResultado);
+
+        free(vetor);
+        free(vetorContadores);
+        free(vetorSomatorio);
     }
+
 
     return 0;
 }
