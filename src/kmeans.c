@@ -109,22 +109,28 @@ void gerarCentroids(struct pgm *pio, int *v, int k){
     }
 }
 
-double calcularInercia(struct pgm *pio, int *v, int k){
+double calcularInercia(struct pgm *pio, int *v, int k) {
     double inercia = 0.0;
     
     for (int i = 0; i < pio->r; i++) {
         for (int j = 0; j < pio->c; j++) {
             int index = i * pio->c + j;
-            int menorDist = (pio->pData[index] - v[0]);
-
+            int valorPixel = pio->pData[index];
+            
+            
+            int clusterMaisProximo = 0;
+            int menorDistanciaQuadrada = (valorPixel - v[0]) * (valorPixel - v[0]);
+            
             for (int m = 1; m < k; m++) {
-                int dist = (pio->pData[index] - v[m]);
-                if (dist < menorDist) {
-                    menorDist = dist;
+                int distanciaQuadrada = (valorPixel - v[m]) * (valorPixel - v[m]);
+                if (distanciaQuadrada < menorDistanciaQuadrada) {
+                    menorDistanciaQuadrada = distanciaQuadrada;
+                    clusterMaisProximo = m;
                 }
             }
-
-            inercia += menorDist;
+            
+            
+            inercia += menorDistanciaQuadrada;
         }
     }
     

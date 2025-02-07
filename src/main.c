@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
         
         for (int k = 1; k <= 10; k++) {
             printf("Executando K-Means para K = %d...\n", k);
+            writePGMImage(&img, argv[2]);
             readPGMImage(&img, argv[2]);
             int *vetor = (int *)malloc(k * sizeof(int));
             int *vetorContadores = (int *)calloc(k, sizeof(int));
