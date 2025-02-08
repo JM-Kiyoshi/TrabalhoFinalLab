@@ -104,8 +104,8 @@ void writePGMImage(struct pgm *pio, char *filename){
 
 void gerarCentroids(struct pgm *pio, int *v, int k){
     for (int i = 0; i < k; i++){
-        int index = rand() % (pio->r * pio->c);
-        v[i] = pio->pData[index];
+        int indice = rand() % (pio->r * pio->c);
+        v[i] = pio->pData[indice];
     }
 }
 
@@ -114,8 +114,8 @@ double calcularInercia(struct pgm *pio, int *v, int k) {
     
     for (int i = 0; i < pio->r; i++) {
         for (int j = 0; j < pio->c; j++) {
-            int index = i * pio->c + j;
-            int valorPixel = pio->pData[index];
+            int indice = i * pio->c + j;
+            int valorPixel = pio->pData[indice];
             
             
             int clusterMaisProximo = 0;
@@ -203,9 +203,9 @@ struct pgm clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *ve
 
         for (int i = 0; i < pio->r; i++) {
             for (int j = 0; j < pio->c; j++) {
-                int index = i * pio->c + j;
-                int clusterIndex = retornaMenorDistancia(v, k, pio->pData[index], vetorSoma, vetorContador);
-                novaImagem.pData[index] = v[clusterIndex];
+                int indice = i * pio->c + j;
+                int clusterIndice = retornaMenorDistancia(v, k, pio->pData[indice], vetorSoma, vetorContador);
+                novaImagem.pData[indice] = v[clusterIndice];
             }
         }
 
@@ -220,53 +220,27 @@ struct pgm clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *ve
 	return novaImagem;
 }
 
+void criarHistograma(struct pgm *pio){
+	int *histograma = (int *) calloc(256, sizeof(int));
+	for (int i = 0; i < pio->r * pio->c; i++)
+	{
+		int indice = pio->pData[i];
+		histograma[indice] += 1;
+	}
 
-
-int retornaQuantidadePixelIgual(struct pgm *img1, struct pgm *img2){
-	int contador = 0;
-	if((img1->r*img1->c) == (img2->r*img2->c)){
-		for (int i = 0; i < img1->r; i++)
-		{
-			for (int j = 0; j < img1->c; j++)
-			{
-				int index = i * img1->c + j;
-				if(img1->pData[index] == img2->pData[index]){
-					contador++;
-				}
+	FILE *fp = fopen("histograma.txt", "w");
+		fprintf(fp, "dados = [");
+        for (int i = 1; i < 256; i++)
+        {
+            if(histograma[i] != 0){
+				fprintf(fp, ",%d", histograma[i]);
 			}
-			
-		}
-	}
-	else{
-		return 0;
-	}
-	
-	return contador;
-}
-
-int retornaTotalDePixel(struct pgm *img1, struct pgm *img2){
-	int contador1 = 0;
-	int contador2 = 0;
-	for (int i = 0; i < img1->r * img1->c; i++)
-	{
-		contador1++;
-	}
-
-	for (int i = 0; i < img2->r * img2->c; i++)
-	{
-		contador2++;
-	}
-	
-	return contador1+contador2;
-}
-
-double dice(struct pgm *img1, struct pgm *img2){
-	double resultado = 0;
-	int numPixelIgual = retornaQuantidadePixelIgual(img1, img2);
-	int numPixelTotal = retornaTotalDePixel(img1, img2);
-	printf("numero de pixel igual: %d\n", numPixelIgual);
-	printf("numero de pixel total: %d\n", numPixelTotal);
-	resultado = 2*((double)numPixelIgual)/numPixelTotal;
-
-	return resultado;
+        }
+		fprintf(fp, "]");
+        
+        if (fp == NULL) {
+        printf("Erro ao abrir o arquivo\n");
+            exit(1);
+        }
+	free(histograma);
 }

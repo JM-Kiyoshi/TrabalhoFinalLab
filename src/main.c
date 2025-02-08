@@ -23,9 +23,7 @@ int main(int argc, char *argv[]) {
     }
 
     struct pgm img;
-    struct pgm teste;
     readPGMImage(&img, argv[1]);
-    readPGMImage(&teste, argv[1]);
 
     int op = atoi(argv[3]);
 
@@ -39,6 +37,7 @@ int main(int argc, char *argv[]) {
         
         printf("Vamos calcular de k = 1 ate k = 10\n");
         
+        fprintf(fp, "[");
         for (int k = 1; k <= 10; k++) {
             printf("Executando K-Means para K = %d...\n", k);
             writePGMImage(&img, argv[2]);
@@ -52,21 +51,23 @@ int main(int argc, char *argv[]) {
                 vetor[i] = img.pData[index];
             }
 
-            clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
+            struct pgm resultado = clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
             double inercia = calcularInercia(&img, vetor, k);
                     
-            fprintf(fp, "%d %.2f\n", k, inercia);
+            fprintf(fp, ",%.2f", inercia);
             printf("K=%d, Inércia=%.2f\n", k, inercia);
 
             free(vetor);
             free(vetorContadores);
             free(vetorSomatorio);
         }
+        fprintf(fp, "]");
         fclose(fp);
     }
 
     else if(op == 2){
         int k;
+        // criarHistograma(&img);
         printf("Digite o numero de K: ");
         scanf("%d", &k);
         int *vetor = (int *)malloc(k * sizeof(int));
@@ -77,8 +78,8 @@ int main(int argc, char *argv[]) {
 
         struct pgm resultado = clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
         writePGMImage(&resultado, argv[2]);
-        double diceResultado = dice(&img, &resultado);
-        printf("dice: %.2f\n", diceResultado);
+        criarHistograma(&img);
+
 
         free(vetor);
         free(vetorContadores);

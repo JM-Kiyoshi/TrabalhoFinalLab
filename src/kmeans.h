@@ -24,8 +24,6 @@ void viewPGMImage(struct pgm *);
 void writePGMImage(struct pgm *, char *);
 void gerarCentroids(struct pgm *pio, int *v, int k);
 int retornaMenorDistancia(int *v, int k, int valor, int *vetorSoma, int *vetorContador);
-struct pgm clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *vetorSoma, int *vetorContador); //aparentemente ok
-double calcularInercia(struct pgm *pio, int *v, int k); 
-int retornaQuantidadePixelIgual(struct pgm *img1, struct pgm *img2); // aparentemente funcionando bem
-double dice(struct pgm *img1, struct pgm *img2);
-int retornaTotalDePixel(struct pgm *img1, struct pgm *img2); //ok
+struct pgm clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *vetorSoma, int *vetorContador);
+double calcularInercia(struct pgm *pio, int *v, int k);
+void criarHistograma(struct pgm *);
