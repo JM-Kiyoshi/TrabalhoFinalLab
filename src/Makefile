@@ -11,8 +11,8 @@ kmeans:
 	./main a.pgm resultado.pgm 2
 
 separado:
-	gcc -c kmeans.c
-	gcc -c main.c
+	gcc -c kmeans.c -o kmeans.o
+	gcc -c main.c -o main.o
 
 compilar:
-	gcc -o main kmeans.o main.c -O3
+	gcc main.o kmeans.o -o main -O3
