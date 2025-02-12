@@ -94,8 +94,8 @@ int main(int argc, char *argv[]) {
         struct dirent *dir;
         d = opendir("entrada");
 	
-	    char filepath[1024]; // buffer para armazenar o caminho completo
-        char outpath[1024]; // mesma coisa para o caminho de saida
+	    char filepath[1024];
+        char outpath[1024];
 
         int k;
         printf("Digite o numero de K: ");
@@ -107,13 +107,13 @@ int main(int argc, char *argv[]) {
 
 
 
-        // laço de repetição para percorrer todo o diretório de entrada
+        
         while ((dir = readdir(d)) != NULL){
-            if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) { //pra se livrar de um bug
+            if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) {
                 continue;
             }
 
-        snprintf(filepath, sizeof(filepath), "%s/%s", argv[1], dir->d_name); //formatando o caminho para "filepath"
+        snprintf(filepath, sizeof(filepath), "%s/%s", argv[1], dir->d_name);
         printf("%s\n", filepath);
     
         readPGMImage(&img, filepath);
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 		struct pgm resultado = clusterizacao(&img, dir->d_name, vetor, k, vetorSomatorio, vetorContadores);
         
         // Gravando a imagem processada
-        snprintf(outpath, sizeof(outpath), "%s/out-%s",  argv[2],dir->d_name); // formatando saida
+        snprintf(outpath, sizeof(outpath), "%s/out-%s",  argv[2],dir->d_name);
 
         writePGMImage(&resultado, outpath);
 
