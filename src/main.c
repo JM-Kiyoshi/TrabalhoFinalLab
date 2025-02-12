@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
             struct pgm resultado = clusterizacao(&img, argv[4], vetor, k, vetorSomatorio, vetorContadores);
             double inercia = calcularInercia(&img, vetor, k);
-            writePGMImage(&resultado, "teste.pgm");
+            writePGMImage(&resultado, "resultado-sse.pgm");
             fprintf(fp, ",%.2f", inercia);
             printf("K=%d, Inércia=%.2f\n", k, inercia);
 
