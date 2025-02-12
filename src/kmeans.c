@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include "kmeans.h"
 
 #define MAX_ITERACOES 50
@@ -200,7 +201,6 @@ struct pgm clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *ve
 
     do {
         zeraVetorSomaEContador(k, vetorSoma, vetorContador);
-
         for (int i = 0; i < pio->r; i++) {
             for (int j = 0; j < pio->c; j++) {
                 int indice = i * pio->c + j;
@@ -243,4 +243,7 @@ void criarHistograma(struct pgm *pio){
             exit(1);
         }
 	free(histograma);
+}
+
+void LerDiretorio(struct pgm *pio, int *v, int k, int *vetorSoma, int *vetorContador){
 }

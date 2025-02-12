@@ -5,10 +5,13 @@ clean:
 	rm -r *.o main
 
 sse:
-	./main a.pgm resultado.pgm 1
+	./main ./entrada ./saida 1 a.pgm
+
+histograma:
+	./main ./entrada ./saida 2 a.pgm
 
 kmeans:
-	./main a.pgm resultado.pgm 2
+	./main ./entrada ./saida 3 a.pgm
 
 separado:
 	gcc -c kmeans.c -o kmeans.o

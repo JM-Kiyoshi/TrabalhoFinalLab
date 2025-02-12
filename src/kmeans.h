@@ -27,3 +27,4 @@ int retornaMenorDistancia(int *v, int k, int valor, int *vetorSoma, int *vetorCo
 struct pgm clusterizacao(struct pgm *pio, char *filename, int *v, int k, int *vetorSoma, int *vetorContador);
 double calcularInercia(struct pgm *pio, int *v, int k);
 void criarHistograma(struct pgm *);
+void LerDiretorio();

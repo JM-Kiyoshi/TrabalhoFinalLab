@@ -12,19 +12,22 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <dirent.h>
+#include <string.h>
 #include "kmeans.h"
 
 int main(int argc, char *argv[]) {
     srand(time(NULL));
 
-    if (argc != 4) {
-        printf("Formato: \n\t %s <imagemEntrada.pgm> <imagemSaida.pgm> <o que deseja fazer: 1 - calcular inercia, 2 - clusterizaçao>\n", argv[0]);
+    if (argc != 5) {
+        printf("Formato: \n\t %s <diretorioEntrada> <diretorioSaida> <K clusters> <teste>\n", argv[0]);
         exit(1);
     }
 
-    struct pgm img;
-    readPGMImage(&img, argv[1]);
+    clock_t begin = clock();
 
+    struct pgm img;
+    
     int op = atoi(argv[3]);
 
     if(op == 1){
@@ -40,8 +43,7 @@ int main(int argc, char *argv[]) {
         fprintf(fp, "[");
         for (int k = 1; k <= 10; k++) {
             printf("Executando K-Means para K = %d...\n", k);
-            writePGMImage(&img, argv[2]);
-            readPGMImage(&img, argv[2]);
+            readPGMImage(&img, argv[4]);
             int *vetor = (int *)malloc(k * sizeof(int));
             int *vetorContadores = (int *)calloc(k, sizeof(int));
             int *vetorSomatorio = (int *)calloc(k, sizeof(int));
@@ -51,9 +53,9 @@ int main(int argc, char *argv[]) {
                 vetor[i] = img.pData[index];
             }
 
-            struct pgm resultado = clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
+            struct pgm resultado = clusterizacao(&img, argv[4], vetor, k, vetorSomatorio, vetorContadores);
             double inercia = calcularInercia(&img, vetor, k);
-                    
+            writePGMImage(&resultado, "teste.pgm");
             fprintf(fp, ",%.2f", inercia);
             printf("K=%d, Inércia=%.2f\n", k, inercia);
 
@@ -67,17 +69,18 @@ int main(int argc, char *argv[]) {
 
     else if(op == 2){
         int k;
-        // criarHistograma(&img);
+        
         printf("Digite o numero de K: ");
         scanf("%d", &k);
+        
         int *vetor = (int *)malloc(k * sizeof(int));
         int *vetorContadores = (int *)calloc(k, sizeof(int));
         int *vetorSomatorio = (int *)calloc(k, sizeof(int));
 
+        readPGMImage(&img, argv[4]);
         gerarCentroids(&img, vetor, k);
 
-        struct pgm resultado = clusterizacao(&img, argv[2], vetor, k, vetorSomatorio, vetorContadores);
-        writePGMImage(&resultado, argv[2]);
+        struct pgm resultado = clusterizacao(&img, argv[4], vetor, k, vetorSomatorio, vetorContadores);
         criarHistograma(&img);
 
 
@@ -86,6 +89,51 @@ int main(int argc, char *argv[]) {
         free(vetorSomatorio);
     }
 
+    else if(op == 3){
+        DIR *d;
+        struct dirent *dir;
+        d = opendir("entrada");
+	
+	    char filepath[1024]; // buffer para armazenar o caminho completo
+        char outpath[1024]; // mesma coisa para o caminho de saida
+
+        int k;
+        printf("Digite o numero de K: ");
+        scanf("%d", &k);
+
+        int *vetor = (int *)malloc(k * sizeof(int));
+        int *vetorContadores = (int *)calloc(k, sizeof(int));
+        int *vetorSomatorio = (int *)calloc(k, sizeof(int));
+
+
+
+        // laço de repetição para percorrer todo o diretório de entrada
+        while ((dir = readdir(d)) != NULL){
+            if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) { //pra se livrar de um bug
+                continue;
+            }
+
+        snprintf(filepath, sizeof(filepath), "%s/%s", argv[1], dir->d_name); //formatando o caminho para "filepath"
+        printf("%s\n", filepath);
+    
+        readPGMImage(&img, filepath);
+        gerarCentroids(&img, vetor, k);
+
+		struct pgm resultado = clusterizacao(&img, dir->d_name, vetor, k, vetorSomatorio, vetorContadores);
+        
+        // Gravando a imagem processada
+        snprintf(outpath, sizeof(outpath), "%s/out-%s",  argv[2],dir->d_name); // formatando saida
+
+        writePGMImage(&resultado, outpath);
+
+    }
+
+    closedir(d);
+    }
+
+    double end = (double)(clock() - begin) / CLOCKS_PER_SEC;
+
+    printf("%lf segundos\n", end);
 
     return 0;
 }
